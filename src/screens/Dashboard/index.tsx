@@ -1,4 +1,5 @@
 import React from "react";
+import { Alert } from "react-native";
 import { HighlightCard } from "../../components/HighlightCard";
 import {
   TransactionCard,
@@ -19,6 +20,7 @@ import {
   Title,
   Transactions,
   TransactionList,
+  LogoutButton,
 } from "./styles";
 
 export interface DataListProps extends TransactionCardProps {
@@ -53,6 +55,10 @@ export function Dashboard() {
     },
   ];
 
+  function teste() {
+    Alert.alert("Teste");
+  }
+
   return (
     <Container>
       <Header>
@@ -68,7 +74,10 @@ export function Dashboard() {
               <UserName>Pedro</UserName>
             </User>
           </UserInfo>
-          <Icon name="power" />
+
+          <LogoutButton onPress={teste}>
+            <Icon name="power" />
+          </LogoutButton>
         </UserWrapper>
       </Header>
 
