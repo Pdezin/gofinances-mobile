@@ -79,8 +79,12 @@ export function Dashboard() {
     let entriesTotal = 0;
     let expensiveTotal = 0;
 
-    const transactionsFormatted: DataListProps[] = transaction.map(
-      (item: DataListProps) => {
+    const transactionsFormatted: DataListProps[] = transaction
+      .sort(
+        (a: DataListProps, b: DataListProps) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+      )
+      .map((item: DataListProps) => {
         if (item.type === "positive") {
           entriesTotal += Number(item.amount);
         } else {
@@ -103,8 +107,7 @@ export function Dashboard() {
           category: item.category,
           date,
         };
-      }
-    );
+      });
 
     setTransactions(transactionsFormatted);
 
@@ -139,10 +142,6 @@ export function Dashboard() {
 
     setIsLoading(false);
   }
-
-  useEffect(() => {
-    loadTransaction();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
