@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, ActivityIndicator } from "react-native";
+import React, { useCallback, useState } from "react";
+import { ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTheme } from "styled-components";
@@ -28,6 +28,8 @@ import {
   LoadContainer,
 } from "./styles";
 
+import { useAuth } from "../../hooks/auth";
+
 export interface DataListProps extends TransactionCardProps {
   id: string;
 }
@@ -50,20 +52,21 @@ export function Dashboard() {
     {} as HighlightData
   );
 
+  const { signOut, user } = useAuth();
+
   const theme = useTheme();
 
   function getLastTransactionDate(
     collection: DataListProps[],
     type: "positive" | "negative"
   ) {
-    const lastTransaction = new Date(
-      Math.max.apply(
-        Math,
-        collection
-          .filter((transaction) => transaction.type === type)
-          .map((transaction) => new Date(transaction.date).getTime())
-      )
-    );
+    const transactionsTime = collection
+      .filter((transaction) => transaction.type === type)
+      .map((transaction) => new Date(transaction.date).getTime());
+
+    if (transactionsTime.length === 0) return "";
+
+    const lastTransaction = new Date(Math.max.apply(Math, transactionsTime));
 
     return `${lastTransaction.getDate()} de ${lastTransaction.toLocaleString(
       "pt-BR",
@@ -72,7 +75,7 @@ export function Dashboard() {
   }
 
   async function loadTransaction() {
-    const dataKey = "@gofinances:transactions";
+    const dataKey = `@gofinances:transactions_user:${user.id}`;
     const response = await AsyncStorage.getItem(dataKey);
     const transaction = response ? JSON.parse(response) : [];
 
@@ -121,18 +124,24 @@ export function Dashboard() {
       "negative"
     );
 
-    const totalInterval = `01 a ${lastTransactionExpensives}`;
+    const totalInterval = lastTransactionExpensives
+      ? `01 a ${lastTransactionExpensives}`
+      : "";
 
     const total = entriesTotal - expensiveTotal;
 
     setHighlightData({
       entries: {
         amount: formatHelper.formatCurrency(entriesTotal),
-        lastTransaction: `Última entrada dia ${lastTransactionEntries}`,
+        lastTransaction: lastTransactionEntries
+          ? `Última entrada dia ${lastTransactionEntries}`
+          : "",
       },
       expensives: {
         amount: formatHelper.formatCurrency(expensiveTotal),
-        lastTransaction: `Última saída dia ${lastTransactionExpensives}`,
+        lastTransaction: lastTransactionExpensives
+          ? `Última saída dia ${lastTransactionExpensives}`
+          : "",
       },
       total: {
         amount: formatHelper.formatCurrency(total),
@@ -149,10 +158,6 @@ export function Dashboard() {
     }, [])
   );
 
-  function teste() {
-    Alert.alert("Saiu do APP!");
-  }
-
   return (
     <Container>
       {isLoading ? (
@@ -166,16 +171,16 @@ export function Dashboard() {
               <UserInfo>
                 <Photo
                   source={{
-                    uri: "https://avatars.githubusercontent.com/u/82681415?v=4",
+                    uri: user.photo,
                   }}
                 />
                 <User>
                   <UserGreeting>Olá,</UserGreeting>
-                  <UserName>Pedro</UserName>
+                  <UserName>{user.name}</UserName>
                 </User>
               </UserInfo>
 
-              <LogoutButton onPress={teste}>
+              <LogoutButton onPress={signOut}>
                 <Icon name="power" />
               </LogoutButton>
             </UserWrapper>
