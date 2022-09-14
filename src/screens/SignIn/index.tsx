@@ -21,7 +21,7 @@ import {
 
 export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
-  const { signInWithGoogle, signInWithApple } = useAuth();
+  const { signInWithGoogle, signInWithApple, signInWithGuest } = useAuth();
 
   const theme = useTheme();
 
@@ -31,7 +31,7 @@ export function SignIn() {
       return await signInWithGoogle();
     } catch (error) {
       console.log(error);
-      Alert.alert("Não foi possível conectar a conta Google");
+      Alert.alert("Não foi possível conectar a conta Google ");
       setIsLoading(false);
     }
   }
@@ -40,6 +40,17 @@ export function SignIn() {
     try {
       setIsLoading(true);
       return await signInWithApple();
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Não foi possível conectar a conta Apple");
+      setIsLoading(false);
+    }
+  }
+
+  function handleSignInWithGuest() {
+    try {
+      setIsLoading(true);
+      return signInWithGuest();
     } catch (error) {
       console.log(error);
       Alert.alert("Não foi possível conectar a conta Apple");
@@ -78,6 +89,11 @@ export function SignIn() {
               onPress={handleSignInWithApple}
             />
           )}
+
+          <SignInSocialButton
+            title="Entrar como convidado"
+            onPress={handleSignInWithGuest}
+          />
         </FooterWrapper>
 
         {isLoading && (

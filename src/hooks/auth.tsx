@@ -24,6 +24,7 @@ interface IAuthContextData {
   user: User;
   signInWithGoogle(): Promise<void>;
   signInWithApple(): Promise<void>;
+  signInWithGuest(): Promise<void>;
   signOut(): Promise<void>;
   userStorageLoading: boolean;
 }
@@ -107,6 +108,26 @@ function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  async function signInWithGuest() {
+    try {
+      const name = "Guest";
+      const photo = `https://ui-avatars.com/api/?name=${name}&length=1&background=random`;
+
+      const userLogged = {
+        id: "guest_user",
+        email: "guest_user@finances.com",
+        name,
+        photo,
+      };
+
+      setUser(userLogged);
+
+      await AsyncStorage.setItem(userStorageKey, JSON.stringify(userLogged));
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  }
+
   async function signOut() {
     setUser({} as User);
     await AsyncStorage.removeItem(userStorageKey);
@@ -133,6 +154,7 @@ function AuthProvider({ children }: AuthProviderProps) {
         user,
         signInWithGoogle,
         signInWithApple,
+        signInWithGuest,
         signOut,
         userStorageLoading,
       }}
