@@ -3,6 +3,12 @@
     "name": "gofinances",
     "slug": "gofinances",
     "version": "1.0.0",
-    "assetBundlePatterns": ["**/*"]
+    "icon": "./assets/logo.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "package": "com.pdezin.gofinances"
+    }
   }
 }
